@@ -63,7 +63,8 @@ apiRouter.post('/payments/webhook', async (req: Request, res: Response) => {
     const { telegram_id, amount, tokens_added, provider, external_id, secret } = req.body;
     
     // Optional secret verification for webhook security
-    if (process.env.WEBHOOK_SECRET && secret !== process.env.WEBHOOK_SECRET) {
+    // Fail closed: without a configured secret no payment can be credited.
+    if (!process.env.WEBHOOK_SECRET || secret !== process.env.WEBHOOK_SECRET) {
       return res.status(403).json({ error: 'Invalid webhook secret' });
     }
 

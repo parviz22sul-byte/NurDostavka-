@@ -28,8 +28,8 @@ export async function authMiddleware(req: Request & { user?: any }, res: Respons
       // In development mode without real bot token, allow mock data or verify
       let telegramUser = verifyTelegramAuth(initData, botToken);
       
-      // Fallback for dev mode / testing
-      if (!telegramUser && process.env.NODE_ENV !== 'production') {
+      // Unsigned initData is accepted only when explicitly enabled for local development.
+      if (!telegramUser && process.env.ALLOW_INSECURE_DEV_AUTH === 'true' && process.env.NODE_ENV !== 'production') {
         try {
           const parsed = JSON.parse(initData);
           if (parsed && parsed.id) telegramUser = parsed;

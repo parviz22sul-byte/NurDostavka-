@@ -165,27 +165,10 @@ export default function App() {
     }
   };
 
-  const handleTopUp = async (amount: number, tokens: number) => {
-    try {
-      const res = await fetch('/api/payments/webhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telegram_id: user.telegram_id,
-          amount,
-          tokens_added: tokens,
-          provider: 'TestPayment',
-          external_id: 'topup_' + Date.now()
-        })
-      });
-      if (res.ok) {
-        alert(`Успешно пополнено! Зачислено ${tokens} токенов.`);
-        fetchUserData();
-        window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  // Tokens are credited only by the server-side payment webhook after the provider confirms payment.
+  // The client never calls the webhook itself.
+  const handleTopUp = (_amount: number, _tokens: number) => {
+    alert('Платёжный провайдер ещё не подключён. Баланс пополнится автоматически после подтверждения оплаты.');
   };
 
   const handleAdminToggleBlock = async (userId: number, currentStatus: boolean) => {
