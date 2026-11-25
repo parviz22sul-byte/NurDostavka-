@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
-import pool from './db.js';
-import { verifyTelegramAuth, generateApiKey } from './auth.js';
+import pool from './db';
+import { verifyTelegramAuth, generateApiKey } from './auth';
 
 export const router = express.Router();
 

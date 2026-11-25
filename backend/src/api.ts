@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import pool from './db.js';
-import { authMiddleware, adminMiddleware } from './middleware.js';
-import { generateApiKey } from './auth.js';
+import pool from './db';
+import { authMiddleware, adminMiddleware } from './middleware';
+import { generateApiKey } from './auth';
 import axios from 'axios';
 
 export const apiRouter = express.Router();

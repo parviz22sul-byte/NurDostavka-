@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { initDb } from './schema.js';
-import { apiRouter } from './api.js';
+import { initDb } from './schema';
+import { apiRouter } from './api';
 
 dotenv.config();
 
