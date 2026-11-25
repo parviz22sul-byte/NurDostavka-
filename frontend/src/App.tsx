@@ -6,6 +6,10 @@ import {
 } from 'lucide-react';
 import { translations } from './i18n';
 
+// API base URL: set VITE_API_URL in Vercel/Railway env to point at the backend.
+// Falls back to same-origin /api for local development with vite proxy.
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? '';
+
 // Extend Telegram WebApp global types
 declare global {
   interface Window {
@@ -80,7 +84,7 @@ export default function App() {
 
   const fetchUserData = async () => {
     try {
-      const res = await fetch('/api/auth/me', {
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
         headers: {
           'x-telegram-init-data': getInitData()
         }
@@ -101,7 +105,7 @@ export default function App() {
 
   const fetchModels = async () => {
     try {
-      const res = await fetch('/api/models', {
+      const res = await fetch(`${API_BASE}/api/models`, {
         headers: { 'x-telegram-init-data': getInitData() }
       });
       if (res.ok) {
@@ -116,8 +120,8 @@ export default function App() {
   const fetchHistory = async () => {
     try {
       const [txRes, usageRes] = await Promise.all([
-        fetch('/api/transactions', { headers: { 'x-telegram-init-data': getInitData() } }),
-        fetch('/api/usage', { headers: { 'x-telegram-init-data': getInitData() } })
+        fetch(`${API_BASE}/api/transactions`, { headers: { 'x-telegram-init-data': getInitData() } }),
+        fetch(`${API_BASE}/api/usage`, { headers: { 'x-telegram-init-data': getInitData() } })
       ]);
       if (txRes.ok) setTransactions(await txRes.json());
       if (usageRes.ok) setUsageLogs(await usageRes.json());
@@ -129,8 +133,8 @@ export default function App() {
   const fetchAdminData = async () => {
     try {
       const [statsRes, usersRes] = await Promise.all([
-        fetch('/api/admin/stats', { headers: { 'x-telegram-init-data': getInitData() } }),
-        fetch('/api/admin/users', { headers: { 'x-telegram-init-data': getInitData() } })
+        fetch(`${API_BASE}/api/admin/stats`, { headers: { 'x-telegram-init-data': getInitData() } }),
+        fetch(`${API_BASE}/api/admin/users`, { headers: { 'x-telegram-init-data': getInitData() } })
       ]);
       if (statsRes.ok) setAdminStats(await statsRes.json());
       if (usersRes.ok) setAdminUsers(await usersRes.json());
@@ -142,7 +146,7 @@ export default function App() {
   const handleRegenerateKey = async () => {
     if (!confirm('Вы уверены, что хотите перевыпустить API ключ? Старый ключ перестанет работать.')) return;
     try {
-      const res = await fetch('/api/auth/regenerate-key', {
+      const res = await fetch(`${API_BASE}/api/auth/regenerate-key`, {
         method: 'POST',
         headers: { 'x-telegram-init-data': getInitData() }
       });
@@ -173,7 +177,7 @@ export default function App() {
 
   const handleAdminToggleBlock = async (userId: number, currentStatus: boolean) => {
     try {
-      const res = await fetch(`/api/admin/users/${userId}/status`, {
+      const res = await fetch(`${API_BASE}/api/admin/users/${userId}/status`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -196,7 +200,7 @@ export default function App() {
     if (isNaN(amount)) return;
 
     try {
-      const res = await fetch(`/api/admin/users/${userId}/balance`, {
+      const res = await fetch(`${API_BASE}/api/admin/users/${userId}/balance`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
