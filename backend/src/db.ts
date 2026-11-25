@@ -4,21 +4,26 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Direct PostgreSQL pool for raw SQL (schema init, complex queries)
+const connectionString = process.env.DATABASE_URL || '';
+
+// Direct PostgreSQL pool for raw SQL queries
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('supabase.co') ? { rejectUnauthorized: false } : false,
+  connectionString,
+  ssl: connectionString.includes('supabase') ? { rejectUnauthorized: false } : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
 pool.on('connect', () => {
-  console.log('Connected to PostgreSQL (Supabase) database successfully.');
+  console.log('Connected to Supabase PostgreSQL successfully.');
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle PostgreSQL client', err);
+  console.error('PostgreSQL pool error:', err.message);
 });
 
-// Supabase JS client for convenience operations
+// Supabase JS client (service role) for admin operations
 export const supabase = createClient(
   process.env.SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || '',
