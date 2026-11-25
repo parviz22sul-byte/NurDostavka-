@@ -4,7 +4,7 @@
   "description": "Nur AI Backend API Gateway and Telegram WebApp Service",
   "main": "dist/index.js",
   "scripts": {
-    "build": "./node_modules/.bin/tsc",
+    "build": "node node_modules/typescript/bin/tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
