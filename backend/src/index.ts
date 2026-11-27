@@ -7,30 +7,29 @@ import { apiRouter } from './api';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// Mount API router
 app.use('/api', apiRouter);
 
-// Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'Nur AI Backend API', timestamp: new Date().toISOString() });
 });
 
-// Start server and initialize DB
-async function startServer() {
-  try {
-    await initDb();
-    app.listen(PORT, () => {
-      console.log(`Nur AI Backend running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
-}
+// Local/container entrypoint. Vercel imports the exported Express app instead.
+export default app;
 
-startServer();
+if (require.main === module) {
+  const port = Number(process.env.PORT || 5000);
+  initDb()
+    .then(() => {
+      app.listen(port, () => {
+        console.log(`Nur AI Backend running on port ${port}`);
+      });
+    })
+    .catch((err) => {
+      console.error('Failed to start server:', err);
+      process.exit(1);
+    });
+}
