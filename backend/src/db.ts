@@ -1,15 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL || '';
+const connectionString = process.env.DATABASE_URL;
 
-// Direct PostgreSQL pool for raw SQL queries
+// PostgreSQL is connected lazily by route handlers. This keeps Vercel's
+// serverless function import-safe; /health can respond even before DB setup.
 const pool = new Pool({
-  connectionString,
-  ssl: connectionString.includes('supabase') ? { rejectUnauthorized: false } : false,
+  ...(connectionString ? { connectionString } : {}),
+  ...(connectionString?.includes('supabase') ? { ssl: { rejectUnauthorized: false } } : {}),
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
@@ -22,12 +22,5 @@ pool.on('connect', () => {
 pool.on('error', (err) => {
   console.error('PostgreSQL pool error:', err.message);
 });
-
-// Supabase JS client (service role) for admin operations
-export const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-  { auth: { persistSession: false } }
-);
 
 export default pool;
